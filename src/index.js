@@ -46,21 +46,23 @@ class BinarySupport {
   }
 
   afterDeploy() {
-    const mimeTypes = this.serverless.service.custom.apigwBinary.types;
-    const swaggerInput = JSON.stringify({
-      "swagger": "2.0",
-      "info": {
-        "title": this.getApiGatewayName()
-      },
-      "x-amazon-apigateway-binary-media-types": mimeTypes
-    });
-    const stage = this.options.stage || this.serverless.service.provider.stage;
-
-    return this.getApiId(stage).then(apiId => {
-      return this.putSwagger(apiId, swaggerInput).then(() => {
-        return this.createDeployment(apiId, stage);
+    if (this.serverless.service.custom.apigwBinary) {
+      const mimeTypes = this.serverless.service.custom.apigwBinary.types;
+      const swaggerInput = JSON.stringify({
+        "swagger": "2.0",
+        "info": {
+          "title": this.getApiGatewayName()
+        },
+        "x-amazon-apigateway-binary-media-types": mimeTypes
       });
-    });
+      const stage = this.options.stage || this.serverless.service.provider.stage;
+
+      return this.getApiId(stage).then(apiId => {
+        return this.putSwagger(apiId, swaggerInput).then(() => {
+          return this.createDeployment(apiId, stage);
+        });
+      });
+    }
   }
 }
 
